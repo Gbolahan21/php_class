@@ -2,14 +2,60 @@
 
     session_start();
 
-    print_r($_POST);
-
     $email = $_POST["email"];
     $password = $_POST["password"];
 
     if (!$email || !$password){
         header("Location: index.php?message=Please Enter your credentials");   
     } else {
+        // image upload handling
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            if (!isset($_FILES['file']) || $_FILES['file']['error'] !== 0) {
+                header("Location: index.php?upload_error=No file uploaded");
+                exit;
+            }
+
+            $pem_file = $_FILES['file']['name'];
+            $tmp_file = $_FILES['file']['tmp_name'];
+            $size = $_FILES['file']['size'];
+
+            if ($size > 2000000) {
+                header("Location: index.php?upload_error=File too large");
+                exit;
+            }
+
+            $allowed_ext = ['jpeg', 'jpg', 'png'];
+            $file_extension = strtolower(pathinfo($pem_file, PATHINFO_EXTENSION));
+
+            if (!in_array($file_extension, $allowed_ext)) {
+                header("Location: index.php?upload_error=Invalid file extension");
+                exit;
+            }
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $tmp_file);
+
+            if (!in_array($mime, ['image/jpeg', 'image/png'])) {
+                header("Location: index.php?upload_error=Invalid file type");
+                exit;
+            }
+
+            $new_file_name = uniqid() . "." . $file_extension;
+
+            if (!is_dir('uploads')) {
+                mkdir('uploads', 0777, true);
+            }
+
+            if (move_uploaded_file($tmp_file, "uploads/" . $new_file_name)) {
+                $_SESSION['image'] = $new_file_name;
+            } else {
+                header("Location: index.php?upload_error=Upload failed");
+                exit;
+            }
+        }
+
+        // email and password handling
 
         $_SESSION['email'] = $email;
 
