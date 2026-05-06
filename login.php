@@ -1,7 +1,10 @@
 <?php
 
+    include "connect.php";
+
     session_start();
 
+    $name = $_POST["name"];
     $email = $_POST["email"];
     $password = $_POST["password"];
 
@@ -48,21 +51,26 @@
             }
 
             if (move_uploaded_file($tmp_file, "uploads/" . $new_file_name)) {
-                $_SESSION['image'] = $new_file_name;
+                $_SESSION['image'] = $new_file_name;   
+            
+            $query = mysqli_query($db_connect, "INSERT INTO `users` (`name`, `email`, `password`) VALUES ('$name', '$email', '$password')");
+            
+            if (!$query){ header("Location: index.php?message='Failed to create user'");}
+
+
+            // email and password handling
+
+            $_SESSION['email'] = $email;
+            if (isset($_POST['remember'])) {
+                setcookie("email", $email, time() + (86400 * 30), "/");
+            }
+            
+            
+            header("Location: dashboard.php");
             } else {
                 header("Location: index.php?upload_error=Upload failed");
                 exit;
             }
         }
-
-        // email and password handling
-
-        $_SESSION['email'] = $email;
-
-        if (isset($_POST['remember'])) {
-            setcookie("email", $email, time() + (86400 * 30), "/");
-        }
-
-        header("Location: dashboard.php");
     }
 ?>

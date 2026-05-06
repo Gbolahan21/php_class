@@ -95,6 +95,12 @@
                 <?php endif; ?>
             </div>
 
+            <!-- name -->
+            <label style="font-size:14px; color:#555;">Name</label>
+            <input type="text" name="name" placeholder="Enter your name"
+                   style="width:100%; padding:10px; margin:5px 0 15px; border-radius:8px; border:1px solid #ccc; outline:none;">
+
+
             <!-- Email -->
             <label style="font-size:14px; color:#555;">Email</label>
             <input type="email" name="email" placeholder="Enter your email"
