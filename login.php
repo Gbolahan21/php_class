@@ -50,23 +50,32 @@
                 mkdir('uploads', 0777, true);
             }
 
-            if (move_uploaded_file($tmp_file, "uploads/" . $new_file_name)) {
-                $_SESSION['image'] = $new_file_name;   
-            
-            $query = mysqli_query($db_connect, "INSERT INTO `users` (`name`, `email`, `password`) VALUES ('$name', '$email', '$password')");
-            
-            if (!$query){ header("Location: index.php?message='Failed to create user'");}
+            if (move_uploaded_file($tmp_file, "uploads/" . $new_file_name)) { 
+                // check if the email exist
+                $check_email = mysqli_query($db_connect, "SELECT * FROM users WHERE email = '$email'");
 
-
-            // email and password handling
-
-            $_SESSION['email'] = $email;
-            if (isset($_POST['remember'])) {
-                setcookie("email", $email, time() + (86400 * 30), "/");
-            }
-            
-            
-            header("Location: dashboard.php");
+                if (mysqli_num_rows($check_email) > 0) {
+                    header("Location: index.php?message=Email already exists");
+                    exit;
+                }  
+                
+                $query = mysqli_query($db_connect, "INSERT INTO `users` (`name`, `email`, `password`, `image`) VALUES ('$name', '$email', '$password', '$new_file_name')");
+                
+                if (!$query) { 
+                    header("Location: index.php?message='Failed to create user'");
+                    exit;
+                }
+                
+                // email and password handling
+                $_SESSION['email'] = $email;
+                $_SESSION['image'] = $new_file_name;
+                
+                if (isset($_POST['remember'])) {
+                    setcookie("email", $email, time() + (86400 * 30), "/");
+                }
+                
+                header("Location: dashboard.php");
+                exit;
             } else {
                 header("Location: index.php?upload_error=Upload failed");
                 exit;

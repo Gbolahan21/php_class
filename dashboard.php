@@ -1,4 +1,5 @@
 <?php 
+    include "connect.php";
     session_start();
 
     if(!isset($_SESSION["email"])) {
@@ -8,6 +9,9 @@
 
     $email = $_SESSION["email"];
     $image = $_SESSION['image'];
+
+    $query = mysqli_query($db_connect, "SELECT * FROM `users` WHERE `email` = '$email' and `image` = '$image'");
+    $user = mysqli_fetch_assoc($query);
 ?>
 
 <!DOCTYPE html>
@@ -37,8 +41,8 @@
         <!-- RIGHT: USER INFO -->
         <div style="display:flex; align-items:center; gap:10px;">
 
-            <?php if ($image): ?>
-                <img src="uploads/<?php echo $image; ?>" 
+            <?php if ($user['image']): ?>
+                <img src="uploads/<?php echo $user['image']; ?>" 
                     alt="User Image"
                     style="
                         width:40px;
@@ -65,10 +69,7 @@
             <?php endif; ?>
 
             <div style="display:flex; flex-direction:column; line-height:1.2;">
-                <span style="font-size:13px; opacity:0.9;">Welcome</span>
-                <span style="font-weight:bold; font-size:14px;">
-                    <?php echo htmlspecialchars($email); ?>
-                </span>
+                <span style="font-size:13px; opacity:0.9;">Welcome, <?php echo htmlspecialchars($user['name']); ?></span>
             </div>
 
         </div>
