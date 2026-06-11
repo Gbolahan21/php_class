@@ -1,16 +1,16 @@
 <?php 
+     include "connect.php";
     session_start();
 
-    if (isset($_SESSION['email'])) {
-        header("Location: dashboard.php");
+    if(!isset($_SESSION["email"])) {
+        header("Location: index.php?message=Please login first");
         exit;
     }
 
-    if (isset($_COOKIE['email'])) {
-        $_SESSION['email'] = $_COOKIE['email'];
-        header("Location: dashboard.php");
-        exit;
-    }
+    $email = $_SESSION["email"];
+    
+    $query = mysqli_query($db_connect, "SELECT * FROM `users` WHERE `email` = '$email'");
+    $user = mysqli_fetch_assoc($query);
 
     $message = !empty($_GET['message']) ? $_GET["message"] : "Enter your credentials";
 
@@ -45,7 +45,7 @@
         <?php endif; ?>
 
         <!-- FORM -->
-        <form action="register.php" method="POST" enctype="multipart/form-data"
+        <form action="edit.php" method="POST" enctype="multipart/form-data"
               style="
                 background:#fff;
                 padding:30px;
@@ -54,7 +54,7 @@
                 box-shadow:0 10px 25px rgba(0,0,0,0.2);
               ">
 
-            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Register</h2>
+            <h2 style="text-align:center; margin-bottom:20px; color:#333;">Profile</h2>
 
             <!-- Upload Avatar -->
             <div style="text-align:center; margin-bottom:20px;">
@@ -104,7 +104,7 @@
             <!-- Email -->
             <label style="font-size:14px; color:#555;">Email</label>
             <input type="email" name="email" placeholder="Enter your email"
-                   style="width:100%; padding:10px; margin:5px 0 15px; border-radius:8px; border:1px solid #ccc; outline:none;">
+                   style="width:100%; padding:10px; margin:5px 0 15px; border-radius:8px; border:1px solid #ccc; outline:none;" value="<?php echo htmlspecialchars($user['email']); ?>" disabled="true">
 
             <!-- Password -->
             <label style="font-size:14px; color:#555;">Password</label>
@@ -128,7 +128,7 @@
                         font-size:16px;
                         cursor:pointer;
                     ">
-                Register
+                Update 
             </button>
 
         </form>

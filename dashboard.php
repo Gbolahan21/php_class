@@ -8,9 +8,8 @@
     }
 
     $email = $_SESSION["email"];
-    $image = $_SESSION['image'];
-
-    $query = mysqli_query($db_connect, "SELECT * FROM `users` WHERE `email` = '$email' and `image` = '$image'");
+    
+    $query = mysqli_query($db_connect, "SELECT * FROM `users` WHERE `email` = '$email'");
     $user = mysqli_fetch_assoc($query);
 ?>
 
