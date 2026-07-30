@@ -2,9 +2,6 @@
     include "connect/connect.php";
     session_start();
 
-    $success = $_GET['success'];
-    $message = $_GET['message'];
-
     if(!isset($_SESSION["email"])) {
         header("Location: signin.php?message=Please login first");
         exit;
@@ -12,7 +9,7 @@
 
     $email = $_SESSION["email"];
     
-    $stmt = mysqli_prepare($db_connect, "SELECT * FROM users WHERE email = ?");
+    $stmt = mysqli_prepare($db_connect, "SELECT * FROM admins WHERE email = ?");
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
 
@@ -25,355 +22,239 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="assets/css/dashboard.css">
+        <link rel="stylesheet" href="assets/css/index.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
         <title>Document</title>
     </head>
     <body>
-        <nav class="navbar">
+        <div class="layout">
+            <!-- sidebar -->
+            <?php include "includes/sidebar.php"; ?>
 
-            <div class="logo">
-                User Dashboard
-            </div>
+            <!-- Main Content -->
+            <div class="main-content">
+               <!-- navbar -->
+                <?php include "includes/navbar.php"; ?>
+                <div class="container">
+                    <h2 class="page-title">
+                        Welcome back, <?php echo htmlspecialchars($user['firstname']); ?>
+                        👋
+                    </h2>
 
-            <div class="user-info">
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card">
+                            <div class="card-icon"><i class="fa-solid fa-user-graduate"></i></div>
 
-                <?php if ($user['image']): ?>
+                            <div>
+                                <h3>Students</h3>
+                                <h1>320</h1>
+                            </div>
+                        </div>
 
-                    <img src="uploads/<?php echo htmlspecialchars($user['image']); ?>" alt="Profile">
+                        <div class="dashboard-card">
+                            <div class="card-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
 
-                <?php else: ?>
+                            <div>
+                                <h3>Teachers</h3>
+                                <h1>24</h1>
+                            </div>
+                        </div>
 
-                    <div class="avatar">
-                        <?php echo strtoupper($user['firstname'][0]); ?>
+                        <div class="dashboard-card">
+                            <div class="card-icon"><i class="fa-solid fa-book-open"></i></div>
+
+                            <div>
+                                <h3>Courses</h3>
+                                <h1>18</h1>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
+
+                            <div>
+                                <h3>Attendance</h3>
+                                <h1>92%</h1>
+                            </div>
+                        </div>
+
                     </div>
 
-                <?php endif; ?>
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h2>Recent Students</h2>
 
-                <span>
-                    Welcome,
-                    <?php echo htmlspecialchars($user['firstname']); ?>
-                </span>
+                            <a href="students.php" class="view-all">
+                                View All
+                            </a>
+                        </div>
 
-               <button id="logoutBtn">
-                    Logout
-                </button>
+                        <table class="students-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Level</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
 
-            </div>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>John Doe</td>
+                                    <td>Computer Science</td>
+                                    <td>300</td>
+                                    <td>
+                                        <span class="status active">
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-dropdown">
+                                            <button class="action-toggle">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
+                                            <div class="action-menu">
+                                                <a href="#">
+                                                    <i class="fa-solid fa-eye"></i> View
+                                                </a>
 
-        </nav>
+                                                <a href="#">
+                                                    <i class="fa-solid fa-pen"></i> Edit
+                                                </a>
 
-        <div class="container">
+                                                <a href="#" class="delete-action">
+                                                    <i class="fa-solid fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
 
-            <div class="card">
+                                <tr>
+                                    <td>2</td>
+                                    <td>Mary Jane</td>
+                                    <td>Accounting</td>
+                                    <td>200</td>
+                                    <td>
+                                        <span class="status active">
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-dropdown">
+                                            <button class="action-toggle">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
+                                            <div class="action-menu">
+                                                <a href="#">
+                                                    <i class="fa-solid fa-eye"></i> View
+                                                </a>
 
-                <h2>Hello, <?php echo htmlspecialchars($user['firstname']); ?> 👋</h2>
+                                                <a href="#">
+                                                    <i class="fa-solid fa-pen"></i> Edit
+                                                </a>
 
-                <p>
-                    Welcome back to your dashboard.
-                </p>
+                                                <a href="#" class="delete-action">
+                                                    <i class="fa-solid fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
 
-                <div class="details">
+                                <tr>
+                                    <td>3</td>
+                                    <td>James Paul</td>
+                                    <td>Biology</td>
+                                    <td>100</td>
+                                    <td>
+                                        <span class="status inactive">
+                                            Inactive
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-dropdown">
+                                            <button class="action-toggle">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
+                                            <div class="action-menu">
+                                                <a href="#">
+                                                    <i class="fa-solid fa-eye"></i> View
+                                                </a>
 
-                    <div class="detail">
-                        <strong>First Name</strong>
-                        <span><?php echo htmlspecialchars($user['firstname']); ?></span>
+                                                <a href="#">
+                                                    <i class="fa-solid fa-pen"></i> Edit
+                                                </a>
+
+                                                <a href="#" class="delete-action">
+                                                    <i class="fa-solid fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div class="detail">
-                        <strong>Last Name</strong>
-                        <span><?php echo htmlspecialchars($user['lastname']); ?></span>
-                    </div>
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h2>Recent Activity</h2>
+                        </div>
 
-                    <div class="detail">
-                        <strong>Email</strong>
-                        <span><?php echo htmlspecialchars($user['email']); ?></span>
-                    </div>
-
-                </div>
-
-            </div>
-
-             <div class="actions">
-
-                <button class="btn btn-primary" id="editProfileBtn">
-                    Update Profile
-                </button>
-
-                <button class="btn btn-danger" id="deleteAccountBtn">
-                    Delete Account
-                </button>
-
-            </div>
-        </div>
-        
-        <div id="profileModal" class="modal">
-
-            <div class="modal-content profile-box">
-
-                <span class="close" id="closeProfile">&times;</span>
-
-                <h2>Update Profile</h2>
-
-                <form action="backend/profile.php" method="POST" enctype="multipart/form-data">
-
-                    <div class="avatar-upload">
-
-                        <label for="fileInput">
-
-                            <?php if (!empty($user['image'])): ?>
-
-                                <img
-                                    src="uploads/<?php echo htmlspecialchars($user['image']); ?>"
-                                    id="previewImage"
-                                    class="profile-preview"
-                                    alt="Profile Image"
-                                >
-
-                            <?php else: ?>
-                                <div id="previewImage" class="profile-avatar">
-                                    <?php echo strtoupper($user['firstname'][0]); ?>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon student">
+                                    <i class="fa-solid fa-user-plus"></i>
                                 </div>
-                            <?php endif; ?>
 
-                        </label>
+                                <div class="activity-info">
+                                    <h4>New Student Added</h4>
+                                    <p>John Doe was registered.</p>
+                                </div>
 
-                        <input type="file" id="fileInput" name="file" accept="image/*" hidden>
+                                <span class="activity-time">
+                                    10 mins ago
+                                </span>
+                            </div>
 
-                        <p id="fileName" class="file-name"></p>
+                            <div class="activity-item">
+                                <div class="activity-icon attendance">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
 
+                                <div class="activity-info">
+                                    <h4>Attendance Recorded</h4>
+                                    <p>Computer Science 300 Level.</p>
+                                </div>
+
+                                <span class="activity-time">
+                                    35 mins ago
+                                </span>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon course">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+
+                                <div class="activity-info">
+                                    <h4>Course Updated</h4>
+                                    <p>CSC 401 was modified.</p>
+                                </div>
+
+                                <span class="activity-time">
+                                    Yesterday
+                                </span>
+                            </div>
+                        </div>
                     </div>
-
-                    <label>First Name</label>
-
-                    <input
-                        type="text"
-                        name="firstname"
-                        value="<?php echo htmlspecialchars($user['firstname']); ?>"
-                        required>
-
-                    <label>Last Name</label>
-
-                    <input
-                        type="text"
-                        name="lastname"
-                        value="<?php echo htmlspecialchars($user['lastname']); ?>"
-                        required>
-
-                    <label>Email</label>
-
-                    <input
-                        type="email"
-                        value="<?php echo htmlspecialchars($user['email']); ?>"
-                        readonly>
-
-                    <label>New Password</label>
-
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Leave blank to keep current password">
-
-                    <label>Confirm Password</label>
-
-                    <input
-                        type="password"
-                        name="cpassword"
-                        placeholder="Confirm password">
-
-                    <div class="modal-buttons">
-
-                        <button type="button" id="cancelProfile">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="btn-primary">
-                            Save Changes
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-        <div id="deleteModal" class="modal">
-
-            <div class="modal-content delete-box">
-                <span class="close" id="closeDelete">&times;</span>
-
-                <h2>Delete Account</h2>
-
-                <form action="backend/delete.php" method="POST">
-
-                    <p>
-                        Are you sure you want to delete this account?
-                    </p>
-
-                    <div class="user-details">
-
-                        <p><strong>Name:</strong>
-                            <?php echo htmlspecialchars($user['firstname']." ".$user['lastname']); ?>
-                        </p>
-
-                        <p><strong>Email:</strong>
-                            <?php echo htmlspecialchars($user['email']); ?>
-                        </p>
-
-                    </div>
-
-                    <div class="modal-buttons">
-
-                        <button type="button" id="cancelDelete">
-                            Cancel
-                        </button>
-
-                        <button type="submit" class="btn-danger">
-                            Delete Account
-                        </button>
-
-                    </div>
-                </form>
-
-            </div>
-        </div>
-
-        <div id="logoutModal" class="modal">
-
-            <div class="modal-content logout-box">
-
-                <span class="close" id="closeLogout">&times;</span>
-
-                <h2>Logout</h2>
-
-                <p>
-                    Are you sure you want to logout?
-                </p>
-
-                <div class="modal-buttons">
-
-                    <button id="stayLoggedIn">
-                        Stay Logged In
-                    </button>
-
-                    <button
-                        class="btn-danger"
-                        onclick="window.location.href='backend/logout.php'">
-
-                        Logout
-
-                    </button>
-
                 </div>
-
             </div>
-
         </div>
-
-        <?php if (!empty($success)): ?>
-            <script>
-                alert("<?php echo htmlspecialchars($success, ENT_QUOTES); ?>");
-
-                // Remove the query string after showing the alert
-                if (window.history.replaceState) {
-                    const url = window.location.pathname;
-                    window.history.replaceState({}, document.title, url);
-                }
-            </script>
-            <?php endif; ?>
-
-            <?php if (!empty($message)): ?>
-            <script>
-                alert("<?php echo htmlspecialchars($message, ENT_QUOTES); ?>");
-
-                if (window.history.replaceState) {
-                    const url = window.location.pathname;
-                    window.history.replaceState({}, document.title, url);
-                }
-            </script>
-        <?php endif; ?>
-
-        <script>
-            const profileModal = document.getElementById("profileModal");
-            const deleteModal = document.getElementById("deleteModal");
-
-            document.getElementById("editProfileBtn").onclick = () => profileModal.style.display = "flex";
-
-            document.getElementById("deleteAccountBtn").onclick = () => deleteModal.style.display = "flex";
-
-            document.getElementById("closeProfile").onclick = () => profileModal.style.display = "none";
-
-            document.getElementById("closeDelete").onclick = () => deleteModal.style.display = "none";
-
-            document.getElementById("cancelDelete").onclick = () => deleteModal.style.display = "none";
-
-            document.getElementById("cancelProfile").onclick = () => profileModal.style.display = "none";
-
-            window.onclick = function(e){
-
-                if(e.target === profileModal){
-                    profileModal.style.display="none";
-                }
-
-                if(e.target === deleteModal){
-                    deleteModal.style.display="none";
-                }
-
-                if(e.target === logoutModal){
-                    logoutModal.style.display = "none";
-                }
-
-            }
-
-            const logoutModal = document.getElementById("logoutModal");
-
-            document.getElementById("logoutBtn").onclick = () => {
-                logoutModal.style.display = "flex";
-            };
-
-            document.getElementById("closeLogout").onclick = () => {
-                logoutModal.style.display = "none";
-            };
-
-            document.getElementById("stayLoggedIn").onclick = () => {
-                logoutModal.style.display = "none";
-            };
-
-            const fileInput = document.getElementById("fileInput");
-            const previewImage = document.getElementById("previewImage");
-            const fileName = document.getElementById("fileName");
-
-            fileInput.addEventListener("change", function () {
-
-                const file = this.files[0];
-
-                if (!file) return;
-
-                // Show filename
-                fileName.textContent = file.name;
-
-                // Preview image
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-
-                    if (previewImage.tagName === "IMG") {
-                        previewImage.src = e.target.result;
-                    } else {
-                        // Replace avatar with image
-                        const img = document.createElement("img");
-                        img.src = e.target.result;
-                        img.id = "previewImage";
-                        img.className = "profile-preview";
-
-                        previewImage.replaceWith(img);
-                    }
-                };
-
-                reader.readAsDataURL(file);
-            });
-        </script>
-
     </body>
 </html>

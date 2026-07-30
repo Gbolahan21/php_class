@@ -53,7 +53,7 @@
 
             if (move_uploaded_file($tmp_file, "../uploads/" . $new_file_name)) { 
                 // check if the email exist
-                $stmt = mysqli_prepare($db_connect, "SELECT id FROM users WHERE email = ?");
+                $stmt = mysqli_prepare($db_connect, "SELECT id FROM admins WHERE email = ?");
                 mysqli_stmt_bind_param($stmt, "s", $email);
                 mysqli_stmt_execute($stmt);
 
@@ -133,7 +133,7 @@
                 
                 $stmt = mysqli_prepare(
                     $db_connect,
-                    "INSERT INTO users (firstname, lastname, email, password, image)
+                    "INSERT INTO admins (firstname, lastname, email, password, image)
                     VALUES (?, ?, ?, ?, ?)"
                 );
 

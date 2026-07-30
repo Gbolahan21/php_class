@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 $email = $_SESSION["email"];
 
 // Prepare delete statement
-$stmt = mysqli_prepare($db_connect, "DELETE FROM users WHERE email = ?");
+$stmt = mysqli_prepare($db_connect, "DELETE FROM admins WHERE email = ?");
 
 if (!$stmt) {
     header("Location: ../dashboard.php?message=Database error");

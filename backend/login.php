@@ -12,7 +12,7 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
-$stmt = mysqli_prepare($db_connect, "SELECT * FROM users WHERE email = ?");
+$stmt = mysqli_prepare($db_connect, "SELECT * FROM admins WHERE email = ?");
 mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
 

@@ -28,7 +28,7 @@
     }
 
     // Get current user
-    $stmt = mysqli_prepare($db_connect, "SELECT image FROM users WHERE email = ?");
+    $stmt = mysqli_prepare($db_connect, "SELECT image FROM admins WHERE email = ?");
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
 
@@ -89,7 +89,7 @@
 
         $stmt = mysqli_prepare(
             $db_connect,
-            "UPDATE users
+            "UPDATE admins
             SET firstname=?, lastname=?, password=?, image=?
             WHERE email=?"
         );
@@ -110,7 +110,7 @@
 
         $stmt = mysqli_prepare(
             $db_connect,
-            "UPDATE users
+            "UPDATE admins
             SET firstname=?, lastname=?, image=?
             WHERE email=?"
         );
