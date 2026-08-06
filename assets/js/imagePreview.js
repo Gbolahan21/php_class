@@ -4,7 +4,7 @@ function setupImagePreview(inputId, previewId, fileNameId) {
     const preview = document.getElementById(previewId);
     const fileName = document.getElementById(fileNameId);
 
-    if (!input) return;
+    if (!input || !preview || !fileName) return;
 
     input.addEventListener("change", function () {
 
@@ -21,6 +21,16 @@ function setupImagePreview(inputId, previewId, fileNameId) {
             if (preview.tagName === "IMG") {
 
                 preview.src = e.target.result;
+
+            } else {
+
+                const img = document.createElement("img");
+
+                img.src = e.target.result;
+                img.id = previewId;
+                img.className = "profile-preview";
+
+                preview.replaceWith(img);
 
             }
 

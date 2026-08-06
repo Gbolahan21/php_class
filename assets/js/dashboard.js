@@ -4,4 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "previewImage",
         "fileName"
     );
+    setupImagePreview(
+        "studentFileInput",
+        "studentPreview",
+        "studentFileName"
+    );
 });

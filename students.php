@@ -15,6 +15,18 @@
 
     $result = mysqli_stmt_get_result($stmt);
     $user = mysqli_fetch_assoc($result);
+
+    // Count total students
+    $studentQuery = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM students");
+    $studentData = mysqli_fetch_assoc($studentQuery);
+
+    $totalStudents = $studentData['total'];
+    $studentLabel = ($totalStudents == 1 || $totalStudents == 0) ? "Student" : "Students";
+
+    $studentsQuery = mysqli_query(
+        $db_connect,
+        "SELECT * FROM students ORDER BY id DESC"
+    );
 ?>
 
 <!DOCTYPE html>
@@ -110,140 +122,133 @@
                             </div>
 
                         </div>
-                        
-                        <div class="table-card">
-                            <div class="table-header">
-                                <h3>Student List</h3>
-                                <span>Total: 320 Students</span>
-                            </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>Student List</h3>
+                            <span>Total: <?php echo $totalStudents . " " . $studentLabel; ?></span>
+                        </div>
 
+                        <div class="table-responsive">
                             <table class="students-table">
-
                                 <thead>
-
                                     <tr>
-
                                         <th>ID</th>
-
                                         <th>Photo</th>
-
                                         <th>Name</th>
-
+                                        <th>Matric No</th>
                                         <th>Email</th>
-
                                         <th>Department</th>
-
                                         <th>Level</th>
-
                                         <th>Status</th>
-
                                         <th>Action</th>
-
                                     </tr>
-
                                 </thead>
-
                                 <tbody>
-
-                                    <tr>
-
-                                        <td>001</td>
-
-                                        <td>
-                                            <img src="assets/images/default-avatar.png" class="student-photo">
-                                        </td>
-
-                                        <td>John Doe</td>
-
-                                        <td>john@gmail.com</td>
-
-                                        <td>Computer Science</td>
-
-                                        <td>300</td>
-
-                                        <td>
-                                            <span class="status active">
-                                                Active
-                                            </span>
-                                        </td>
-
-                                        <td>
-
-                                            <div class="action-dropdown">
-
-                                                <button class="action-toggle">
-
-                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-
-                                                </button>
-
-                                                <div class="action-menu">
-
-                                                    <a href="#">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                        View
-                                                    </a>
-
-                                                    <a href="#">
-                                                        <i class="fa-solid fa-pen"></i>
-                                                        Edit
-                                                    </a>
-
-                                                    <a href="#">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                        Delete
-                                                    </a>
-
-                                                </div>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-
+                                    <?php if (mysqli_num_rows($studentsQuery) > 0): ?>
+                                        <?php while ($student = mysqli_fetch_assoc($studentsQuery)): ?>
+                                            <tr>
+                                                <td><?= str_pad($student['id'], 2, "0", STR_PAD_LEFT); ?></td>
+                                                <td>
+                                                    <?php if (!empty($student['image'])): ?>
+                                                        <img
+                                                            src="uploads/students/<?= htmlspecialchars($student['image']); ?>"
+                                                            class="student-photo"
+                                                            alt="Student Photo"
+                                                        >
+                                                    <?php else: ?>
+                                                        <img
+                                                            src="assets/images/default-avatar.png"
+                                                            class="student-photo"
+                                                            alt="Default Avatar"
+                                                        >
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><?= htmlspecialchars($student['firstname'] . " " . $student['lastname']); ?></td>
+                                                <td><?= htmlspecialchars($student['matric_no']); ?></td>
+                                                <td><?= htmlspecialchars($student['email']); ?></td>
+                                                <td><?= htmlspecialchars($student['department']); ?></td>
+                                                <td><?= htmlspecialchars($student['level']); ?></td>
+                                                <td>
+                                                    <span class="status <?= strtolower($student['status']); ?>">
+                                                        <?= htmlspecialchars($student['status']); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="action-dropdown">
+                                                        <button class="action-toggle">
+                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                        </button>
+                                                        <div class="action-menu">
+                                                            <a href="#">
+                                                                <i class="fa-solid fa-eye"></i>
+                                                                View
+                                                            </a>
+                                                            <a href="#">
+                                                                <i class="fa-solid fa-pen"></i>
+                                                                Edit
+                                                            </a>
+                                                            <a href="#">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                                Delete
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="8" style="text-align:center;padding:30px;">
+                                                No students found.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
                                 </tbody>
-
                             </table>
                         </div>
+                    </div>
 
-                        <div class="table-footer">
+                    <div class="table-footer">
 
-                            <span>
-                                Showing 1 - 10 of 320 students
-                            </span>
+                        <span>
+                            Showing 1 - 10 of 320 students
+                        </span>
 
-                            <div class="pagination">
+                        <div class="pagination">
 
-                                <button>
-                                    Previous
-                                </button>
+                            <button>
+                                Previous
+                            </button>
 
-                                <button class="active">
-                                    1
-                                </button>
+                            <button class="active">
+                                1
+                            </button>
 
-                                <button>
-                                    2
-                                </button>
+                            <button>
+                                2
+                            </button>
 
-                                <button>
-                                    3
-                                </button>
+                            <button>
+                                3
+                            </button>
 
-                                <button>
-                                    Next
-                                </button>
-
-                            </div>
+                            <button>
+                                Next
+                            </button>
 
                         </div>
+
                     </div>
                 </div>
             </div>
+            <?php include "includes/modals/addStudent.php"; ?>
         </div>
         <script src="assets/js/filter.js"></script>
-        <script src="assets/js/common.js"></script>
         <script src="assets/js/students.js"></script>
+        <script src="assets/js/dropdown.js"></script>
+        <script src="assets/js/modal.js"></script>
+        <script src="assets/js/imagePreview.js"></script>
+        <script src="assets/js/dashboard.js"></script>
     </body>
 </html>

@@ -61,3 +61,19 @@ document.getElementById("closeDelete").addEventListener("click", () => {
 document.getElementById("cancelDelete").addEventListener("click", () => {
     closeModal("deleteModal");
 });
+
+document.getElementById("addStudentBtn").addEventListener("click", function(e){
+
+    e.preventDefault();
+
+    openModal("addStudentModal");
+
+});
+
+document.getElementById("closeStudent").addEventListener("click", () => {
+    closeModal("addStudentModal");
+});
+
+document.getElementById("cancelStudent").addEventListener("click", () => {
+    closeModal("addStudentModal");
+});
