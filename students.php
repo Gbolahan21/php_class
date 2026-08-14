@@ -16,17 +16,23 @@
     $result = mysqli_stmt_get_result($stmt);
     $user = mysqli_fetch_assoc($result);
 
+    // pagination
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) {
+        $page = 1;
+    }
+    $limit = 5;
+    $offset = ($page - 1) * $limit;
+
     // Count total students
     $studentQuery = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM students");
     $studentData = mysqli_fetch_assoc($studentQuery);
 
     $totalStudents = $studentData['total'];
     $studentLabel = ($totalStudents == 1 || $totalStudents == 0) ? "Student" : "Students";
+    $totalPages = ceil($totalStudents / $limit);
 
-    $studentsQuery = mysqli_query(
-        $db_connect,
-        "SELECT * FROM students ORDER BY id DESC"
-    );
+    $studentsQuery = mysqli_query($db_connect, "SELECT * FROM students ORDER BY id ASC LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>
@@ -62,13 +68,13 @@
 
                     <div class="filter-bar">
 
+                        <!-- search -->
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
-
-                            <input type="text" placeholder="Search students..."
-                            >
+                            <input type="text" placeholder="Search students..." id="studentSearch">
                         </div>
 
+                        <!-- Department Filter -->
                         <div class="filter-dropdown">
 
                             <button class="filter-toggle">
@@ -78,15 +84,16 @@
 
                             <div class="filter-menu">
 
-                                <a href="#">Computer Science</a>
-                                <a href="#">Cybersecurity</a>
-                                <a href="#">Accounting</a>
-                                <a href="#">Biology</a>
+                                <a href="#" data-filter="department" data-value="computer science">Computer Science</a>
+                                <a href="#" data-filter="department" data-value="cybersecurity">Cybersecurity</a>
+                                <a href="#" data-filter="department" data-value="accounting">Accounting</a>
+                                <a href="#" data-filter="department" data-value="biology">Biology</a>
 
                             </div>
 
                         </div>
 
+                        <!-- Level Filter -->
                         <div class="filter-dropdown">
 
                             <button class="filter-toggle">
@@ -96,17 +103,18 @@
 
                             <div class="filter-menu">
 
-                                <a href="#">100</a>
-                                <a href="#">200</a>
-                                <a href="#">300</a>
-                                <a href="#">400</a>
-                                <a href="#">500</a>
-                                <a href="#">600</a>
+                                <a href="#" data-filter="level" data-value="100">100</a>
+                                <a href="#" data-filter="level" data-value="200">200</a>
+                                <a href="#" data-filter="level" data-value="300">300</a>
+                                <a href="#" data-filter="level" data-value="400">400</a>
+                                <a href="#" data-filter="level" data-value="500">500</a>
+                                <a href="#" data-filter="level" data-value="600">600</a>
 
                             </div>
 
                         </div>
 
+                        <!-- Status Filter -->
                         <div class="filter-dropdown">
 
                             <button class="filter-toggle">
@@ -116,13 +124,15 @@
 
                             <div class="filter-menu">
 
-                                <a href="#">Active</a>
-                                <a href="#">Inactive</a>
+                                <a href="#" data-filter="status" data-value="all">All</a>
+                                <a href="#" data-filter="status" data-value="active">Active</a>
+                                <a href="#" data-filter="status" data-value="inactive">Inactive</a>
 
                             </div>
 
                         </div>
                     </div>
+                    
                     <div class="table-card">
                         <div class="table-header">
                             <h3>Student List</h3>
@@ -147,7 +157,11 @@
                                 <tbody>
                                     <?php if (mysqli_num_rows($studentsQuery) > 0): ?>
                                         <?php while ($student = mysqli_fetch_assoc($studentsQuery)): ?>
-                                            <tr>
+                                           <tr
+                                                data-department="<?= htmlspecialchars($student['department']); ?>"
+                                                data-level="<?= htmlspecialchars($student['level']); ?>"
+                                                data-status="<?= htmlspecialchars($student['status']); ?>"
+                                            >
                                                 <td><?= str_pad($student['id'], 2, "0", STR_PAD_LEFT); ?></td>
                                                 <td>
                                                     <?php if (!empty($student['image'])): ?>
@@ -180,17 +194,21 @@
                                                             <i class="fa-solid fa-ellipsis-vertical"></i>
                                                         </button>
                                                         <div class="action-menu">
-                                                            <a href="#">
-                                                                <i class="fa-solid fa-eye"></i>
-                                                                View
-                                                            </a>
-                                                            <a href="#">
+                                                           <a
+                                                                href="#"
+                                                                class="edit-student"
+                                                                data-id="<?= $student['id']; ?>"
+                                                                data-matric="<?= htmlspecialchars($student['matric_no']); ?>"
+                                                                data-firstname="<?= htmlspecialchars($student['firstname']); ?>"
+                                                                data-lastname="<?= htmlspecialchars($student['lastname']); ?>"
+                                                                data-email="<?= htmlspecialchars($student['email']); ?>"
+                                                                data-gender="<?= htmlspecialchars($student['gender']); ?>"
+                                                                data-department="<?= htmlspecialchars($student['department']); ?>"
+                                                                data-level="<?= htmlspecialchars($student['level']); ?>"
+                                                                data-status="<?= htmlspecialchars($student['status']); ?>"
+                                                            >
                                                                 <i class="fa-solid fa-pen"></i>
                                                                 Edit
-                                                            </a>
-                                                            <a href="#">
-                                                                <i class="fa-solid fa-trash"></i>
-                                                                Delete
                                                             </a>
                                                         </div>
                                                     </div>
@@ -210,39 +228,83 @@
                     </div>
 
                     <div class="table-footer">
+                        <?php
+                            $start = $totalStudents > 0
+                                ? $offset + 1
+                                : 0;
 
+                            $end = min(
+                                $offset + $limit,
+                                $totalStudents
+                            );
+                        ?>
                         <span>
-                            Showing 1 - 10 of 320 students
+                            Showing <?= $start ?> - <?= $end ?>
+                            of <?= $totalStudents ?>
+                            <?= $studentLabel ?>
                         </span>
-
                         <div class="pagination">
 
-                            <button>
-                                Previous
-                            </button>
+                            <!-- Previous -->
+                            <?php if ($page > 1): ?>
 
-                            <button class="active">
-                                1
-                            </button>
+                                <a href="?page=<?= $page - 1 ?>">
+                                    Previous
+                                </a>
 
-                            <button>
-                                2
-                            </button>
+                            <?php else: ?>
 
-                            <button>
-                                3
-                            </button>
+                                <button disabled>
+                                    Previous
+                                </button>
 
-                            <button>
-                                Next
-                            </button>
+                            <?php endif; ?>
+
+
+                            <!-- Page Numbers -->
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+                                <?php if ($i == $page): ?>
+
+                                    <a
+                                        href="?page=<?= $i ?>"
+                                        class="active"
+                                    >
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php else: ?>
+
+                                    <a href="?page=<?= $i ?>">
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php endif; ?>
+
+                            <?php endfor; ?>
+
+
+                            <!-- Next -->
+                            <?php if ($page < $totalPages): ?>
+
+                                <a href="?page=<?= $page + 1 ?>">
+                                    Next
+                                </a>
+
+                            <?php else: ?>
+
+                                <button disabled>
+                                    Next
+                                </button>
+
+                            <?php endif; ?>
 
                         </div>
-
                     </div>
                 </div>
             </div>
             <?php include "includes/modals/addStudent.php"; ?>
+            <?php include "includes/modals/edit.php"; ?>
         </div>
         <script src="assets/js/filter.js"></script>
         <script src="assets/js/students.js"></script>

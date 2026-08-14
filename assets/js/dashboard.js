@@ -9,4 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "studentPreview",
         "studentFileName"
     );
+    initStudentDeleteModal();
+    initStudentEditModal();
 });

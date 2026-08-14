@@ -16,6 +16,26 @@
     $result = mysqli_stmt_get_result($stmt);
     $user = mysqli_fetch_assoc($result);
 
+    // pagination
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) {
+        $page = 1;
+    }
+    $limit = 5;
+    $offset = ($page - 1) * $limit;
+
+    // Recent activity pagination
+    $activityPage = isset($_GET['activity_page'])
+        ? (int)$_GET['activity_page']
+        : 1;
+
+    if ($activityPage < 1) {
+        $activityPage = 1;
+    }
+
+    $activityLimit = 5;
+    $activityOffset = ($activityPage - 1) * $activityLimit;
+
     // Count total teachers
     $teacherQuery = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM teachers");
     $teacherData = mysqli_fetch_assoc($teacherQuery);
@@ -23,25 +43,29 @@
     $totalTeachers = $teacherData['total'];
     $teacherLabel = ($totalTeachers == 1) ? "Teacher" : "Teachers";
 
-     // Count total students
+    // Count total students
     $studentQuery = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM students");
     $studentData = mysqli_fetch_assoc($studentQuery);
 
+    // Count total activities
+    $activityCountQuery = mysqli_query(
+        $db_connect,
+        "SELECT COUNT(*) AS total FROM students"
+    );
+
+    $activityCountData = mysqli_fetch_assoc($activityCountQuery);
+
+    $totalActivities = $activityCountData['total'];
+
+    $totalActivityPages = ceil($totalActivities / $activityLimit);
+
     $totalStudents = $studentData['total'];
     $studentLabel = ($totalStudents == 1 || $totalStudents == 0) ? "Student" : "Students";
+    $totalPages = ceil($totalStudents / $limit);
 
-    $studentsQuery = mysqli_query(
-        $db_connect,
-        "SELECT * FROM students ORDER BY id DESC"
-    );
+    $studentsQuery = mysqli_query($db_connect, "SELECT * FROM students ORDER BY id ASC LIMIT $limit OFFSET $offset");
 
-    $recentStudents = mysqli_query(
-        $db_connect,
-        "SELECT firstname, lastname, created_at
-        FROM students
-        ORDER BY created_at DESC
-        LIMIT 5"
-    );
+    $recentStudents = mysqli_query($db_connect, "SELECT firstname, lastname, created_at FROM students ORDER BY created_at DESC LIMIT $activityLimit OFFSET $activityOffset");
 ?>
 
 <!DOCTYPE html>
@@ -108,10 +132,6 @@
                     <div class="table-card">
                         <div class="table-header">
                             <h2>Recent Students</h2>
-
-                            <a href="students.php" class="view-all">
-                                View All
-                            </a>
                         </div>
 
                         <div class="table-responsive">
@@ -165,15 +185,13 @@
                                                             <i class="fa-solid fa-ellipsis-vertical"></i>
                                                         </button>
                                                         <div class="action-menu">
-                                                            <a href="#">
-                                                                <i class="fa-solid fa-eye"></i>
-                                                                View
-                                                            </a>
-                                                            <a href="#">
-                                                                <i class="fa-solid fa-pen"></i>
-                                                                Edit
-                                                            </a>
-                                                            <a href="#">
+                                                            <a
+                                                                href="#"
+                                                                class="delete-action"
+                                                                data-id="<?= $student['id']; ?>"
+                                                                data-name="<?= htmlspecialchars($student['firstname'] . ' ' . $student['lastname']); ?>"
+                                                                data-email="<?= htmlspecialchars($student['email']); ?>"
+                                                            >
                                                                 <i class="fa-solid fa-trash"></i>
                                                                 Delete
                                                             </a>
@@ -191,6 +209,81 @@
                                     <?php endif; ?>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <div class="table-footer">
+                        <?php
+                            $start = $totalStudents > 0
+                                ? $offset + 1
+                                : 0;
+
+                            $end = min(
+                                $offset + $limit,
+                                $totalStudents
+                            );
+                        ?>
+                        <span>
+                            Showing <?= $start ?> - <?= $end ?>
+                            of <?= $totalStudents ?>
+                            <?= $studentLabel ?>
+                        </span>
+                        <div class="pagination">
+
+                            <!-- Previous -->
+                            <?php if ($page > 1): ?>
+
+                                <a href="?page=<?= $page - 1 ?>">
+                                    Previous
+                                </a>
+
+                            <?php else: ?>
+
+                                <button disabled>
+                                    Previous
+                                </button>
+
+                            <?php endif; ?>
+
+
+                            <!-- Page Numbers -->
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+                                <?php if ($i == $page): ?>
+
+                                    <a
+                                        href="?page=<?= $i ?>"
+                                        class="active"
+                                    >
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php else: ?>
+
+                                    <a href="?page=<?= $i ?>">
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php endif; ?>
+
+                            <?php endfor; ?>
+
+
+                            <!-- Next -->
+                            <?php if ($page < $totalPages): ?>
+
+                                <a href="?page=<?= $page + 1 ?>">
+                                    Next
+                                </a>
+
+                            <?php else: ?>
+
+                                <button disabled>
+                                    Next
+                                </button>
+
+                            <?php endif; ?>
+
                         </div>
                     </div>
 
@@ -238,8 +331,78 @@
                             <?php endif; ?>
                         </div>
                     </div>
+
+                    <div class="table-footer">
+                        <?php
+                            $activityStart = $totalActivities > 0
+                                ? $activityOffset + 1
+                                : 0;
+
+                            $activityEnd = min(
+                                $activityOffset + $activityLimit,
+                                $totalActivities
+                            );
+                        ?>
+                        <span>
+                            Showing <?= $activityStart ?> - <?= $activityEnd ?>
+                            of <?= $totalActivities ?> Activities
+                        </span>
+                        <div class="pagination">
+                            <?php if ($activityPage > 1): ?>
+
+                            <a href="?page=<?= $page ?>&activity_page=<?= $activityPage - 1 ?>">
+                                Previous
+                            </a>
+
+                            <?php else: ?>
+                                <button disabled>
+                                    Previous
+                                </button>
+                            <?php endif; ?>
+
+
+                            <?php for ($i = 1; $i <= $totalActivityPages; $i++): ?>
+
+                                <?php if ($i == $activityPage): ?>
+
+                                    <a
+                                        href="?page=<?= $page ?>&activity_page=<?= $i ?>"
+                                        class="active"
+                                    >
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php else: ?>
+
+                                    <a href="?page=<?= $page ?>&activity_page=<?= $i ?>">
+                                        <?= $i ?>
+                                    </a>
+
+                                <?php endif; ?>
+
+                            <?php endfor; ?>
+
+
+                            <?php if ($activityPage < $totalActivityPages): ?>
+
+                                <a href="?page=<?= $page ?>&activity_page=<?= $activityPage + 1 ?>">
+                                    Next
+                                </a>
+
+                            <?php else: ?>
+
+                                <button disabled>
+                                    Next
+                                </button>
+
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <?php include "includes/modals/delete.php"; ?>
         </div>
+        <script src="assets/js/modal.js"></script>
+        <script src="assets/js/dashboard.js"></script>
     </body>
 </html>

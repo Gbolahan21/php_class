@@ -1,29 +1,47 @@
-<div id="deleteModal" class="modal">
+<div id="studentDeleteModal" class="modal">
+
     <div class="modal-content delete-box">
-        <span class="close" id="closeDelete">&times;</span>
-        <h2>Delete Account</h2>
-        <form action="backend/delete.php" method="POST">
+
+        <span class="close" id="closeStudentDelete">&times;</span>
+
+        <h2>Delete Student</h2>
+
+        <p>
+            Are you sure you want to delete this student?
+        </p>
+
+        <div class="user-details">
+
             <p>
-                Are you sure you want to delete this account?
+                <strong>Name:</strong>
+                <span id="deleteStudentName"></span>
             </p>
-            <div class="user-details">
-                <p><strong>Name:</strong>
-                    <?php echo htmlspecialchars($user['firstname']." ".$user['lastname']); ?>
-                </p>
-                <p><strong>Email:</strong>
-                    <?php echo htmlspecialchars($user['email']); ?>
-                </p>
-            </div>
 
-            <div class="modal-buttons">
-                <button type="button" id="cancelDelete">
-                    Cancel
-                </button>
+            <p>
+                <strong>Email:</strong>
+                <span id="deleteStudentEmail"></span>
+            </p>
 
-                <button type="submit" class="btn-danger">
-                    Delete Account
-                </button>
-            </div>
-        </form>
+        </div>
+
+        <div class="modal-buttons">
+
+            <button type="button" id="cancelStudentDelete">
+                Cancel
+            </button>
+
+            <button type="button" class="btn-danger">
+                <a
+                    href="#"
+                    id="confirmStudentDelete"
+                    style="color: white; text-decoration: none;"
+                >
+                    Delete Student
+                </a>
+            </button>
+
+        </div>
+
     </div>
+
 </div>
